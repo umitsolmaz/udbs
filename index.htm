@@ -27,7 +27,7 @@
         color: white;
         text-decoration: underline;
       }
-      nav, .pagination {
+      nav {
         max-width: 800px;
         margin: 1rem auto;
         padding: 0 1rem;
@@ -36,16 +36,29 @@
         gap: 1rem;
         justify-content: center;
       }
-      nav button, .pagination button {
+      nav button {
         padding: 0.5rem 1rem;
         border: none;
         border-radius: 5px;
         background-color: #eee;
         cursor: pointer;
       }
-      nav button.active, .pagination button.active {
+      nav button.active {
         background-color: #4a90e2;
         color: white;
+      }
+      .search {
+        max-width: 800px;
+        margin: 1rem auto;
+        padding: 0 1rem;
+        text-align: center;
+      }
+      .search input {
+        padding: 0.5rem;
+        width: 100%;
+        max-width: 400px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
       }
       main {
         max-width: 800px;
@@ -58,6 +71,7 @@
         margin-bottom: 1.5rem;
         border-radius: 8px;
         box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        cursor: pointer;
       }
       article h2 {
         margin-top: 0;
@@ -65,6 +79,35 @@
       }
       article p {
         margin: 0.5rem 0 0 0;
+      }
+      #modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        justify-content: center;
+        align-items: center;
+      }
+      #modal .modal-content {
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        max-width: 600px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        position: relative;
+      }
+      #modal .close {
+        position: absolute;
+        top: 0.5rem;
+        right: 1rem;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #333;
       }
       footer {
         background: #333;
@@ -100,9 +143,25 @@
       </p>
     </header>
 
-    <nav id="kategori-nav"></nav>
+    <div class="search">
+      <input type="text" id="aramaKutusu" placeholder="Yazı arayın..." oninput="filtrele(seciliKategori)" />
+    </div>
+
+    <nav id="kategori-nav">
+      <button onclick="filtrele('hepsi')" class="active">Tümü</button>
+      <button onclick="filtrele('yazılım')">Yazılım</button>
+      <button onclick="filtrele('tasarım')">Tasarım</button>
+      <button onclick="filtrele('kişisel')">Kişisel</button>
+    </nav>
+
     <main id="yazi-listesi"></main>
-    <div class="pagination" id="sayfalama"></div>
+
+    <div id="modal">
+      <div class="modal-content">
+        <span class="close" onclick="document.getElementById('modal').style.display='none'">&times;</span>
+        <div id="modal-icerik"></div>
+      </div>
+    </div>
 
     <footer>
       <a href="https://twitter.com/kullanici" rel="me" target="_blank">Twitter</a>
@@ -117,73 +176,53 @@
     </footer>
 
     <script>
-      const KATEGORILER = ['hepsi', 'yazılım', 'tasarım', 'kişisel'];
-      const MAKS_YAZI = 2;
+      const yazilar = [
+        {
+          baslik: "Yazılımda Temel Kavramlar",
+          icerik: "Bu yazıda yazılım geliştirmeye yeni başlayanlar için temel kavramları anlatıyorum.",
+          kategori: "yazılım"
+        },
+        {
+          baslik: "Mobil Uyumlu Tasarım Nedir?",
+          icerik: "Mobil cihazlar için tasarım yaparken dikkat edilmesi gerekenler.",
+          kategori: "tasarım"
+        },
+        {
+          baslik: "Kendimi Tanıtıyorum",
+          icerik: "Bu blogda neler paylaşacağımı ve kim olduğumu anlatıyorum.",
+          kategori: "kişisel"
+        },
+      ];
+
       let seciliKategori = 'hepsi';
-      let aktifSayfa = 1;
-      let tumYazilar = [];
 
-      function kategoriMenuOlustur() {
-        const nav = document.getElementById('kategori-nav');
-        nav.innerHTML = '';
-        KATEGORILER.forEach(kat => {
-          const btn = document.createElement('button');
-          btn.textContent = kat[0].toUpperCase() + kat.slice(1);
-          btn.onclick = () => {
-            seciliKategori = kat;
-            aktifSayfa = 1;
-            renderYazilar();
-          };
-          if (kat === seciliKategori) btn.classList.add('active');
-          nav.appendChild(btn);
+      function filtrele(kategori) {
+        seciliKategori = kategori;
+        document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+        const aktif = Array.from(document.querySelectorAll('nav button')).find(btn => btn.textContent.toLowerCase() === kategori);
+        if (aktif) aktif.classList.add('active');
+
+        const liste = document.getElementById("yazi-listesi");
+        liste.innerHTML = "";
+
+        const arama = document.getElementById("aramaKutusu").value.toLowerCase();
+
+        yazilar.forEach(yazi => {
+          if ((kategori === "hepsi" || yazi.kategori === kategori) && (yazi.baslik.toLowerCase().includes(arama) || yazi.icerik.toLowerCase().includes(arama))) {
+            const makale = document.createElement("article");
+            makale.innerHTML = `<h2>${yazi.baslik}</h2><p>${yazi.icerik}</p>`;
+            makale.onclick = () => detayGoster(yazi);
+            liste.appendChild(makale);
+          }
         });
       }
 
-      function renderYazilar() {
-        kategoriMenuOlustur();
-        const ana = document.getElementById('yazi-listesi');
-        ana.innerHTML = '';
-
-        let filtreli = seciliKategori === 'hepsi' ? tumYazilar : tumYazilar.filter(y => y.kategori === seciliKategori);
-
-        const baslangic = (aktifSayfa - 1) * MAKS_YAZI;
-        const gosterilecek = filtreli.slice(baslangic, baslangic + MAKS_YAZI);
-
-        gosterilecek.forEach(yazi => {
-          const makale = document.createElement('article');
-          makale.innerHTML = `<h2>${yazi.baslik}</h2><p>${yazi.icerik}</p>`;
-          ana.appendChild(makale);
-        });
-
-        sayfalamaGoster(filtreli.length);
+      function detayGoster(yazi) {
+        document.getElementById("modal-icerik").innerHTML = `<h2>${yazi.baslik}</h2><p>${yazi.icerik}</p>`;
+        document.getElementById("modal").style.display = "flex";
       }
 
-      function sayfalamaGoster(toplam) {
-        const sayfaDiv = document.getElementById('sayfalama');
-        sayfaDiv.innerHTML = '';
-        const toplamSayfa = Math.ceil(toplam / MAKS_YAZI);
-        for (let i = 1; i <= toplamSayfa; i++) {
-          const btn = document.createElement('button');
-          btn.textContent = i;
-          if (i === aktifSayfa) btn.classList.add('active');
-          btn.onclick = () => {
-            aktifSayfa = i;
-            renderYazilar();
-          };
-          sayfaDiv.appendChild(btn);
-        }
-      }
-
-      fetch('yazilar.json')
-        .then(resp => resp.json())
-        .then(veri => {
-          tumYazilar = veri;
-          renderYazilar();
-        })
-        .catch(() => {
-          document.getElementById('yazi-listesi').innerHTML = '<p>Yazılar yüklenemedi.</p>';
-        });
+      filtrele("hepsi");
     </script>
   </body>
 </html>
-
