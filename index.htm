@@ -1,23 +1,189 @@
-
 <!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>blog</title>
-	</head>
-	<body>
-		<header>
-			<h1></h1>
-			<p><a href="https://" title="...">.com kişisel blog sayfa.</a></p>
-		</header>
-		<footer>
-			<a href="https://" rel="me" target="_blank">Twitter</a>
-			&bull; <a href="https://" rel="me" target="_blank">Pixabay</a>
-			&bull; <a href="https://" rel="me" target="_blank">GitHub</a>
-			&bull; <a href="https://" rel="me" target="_blank">Pixelfed</a>
-			<br/><br/><a href="https://" rel="me" target="_blank">Mastodon</a>
-		</footer>
-		<!-- tasarım son -->
-	</body>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kişisel Blog</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f9f9f9;
+        color: #333;
+        line-height: 1.6;
+      }
+      header {
+        background: #4a90e2;
+        color: white;
+        padding: 2rem 1rem;
+        text-align: center;
+      }
+      header h1 {
+        margin: 0 0 0.5rem 0;
+        font-size: 2.5rem;
+      }
+      header a {
+        color: white;
+        text-decoration: underline;
+      }
+      nav, .pagination {
+        max-width: 800px;
+        margin: 1rem auto;
+        padding: 0 1rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+      }
+      nav button, .pagination button {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 5px;
+        background-color: #eee;
+        cursor: pointer;
+      }
+      nav button.active, .pagination button.active {
+        background-color: #4a90e2;
+        color: white;
+      }
+      main {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+      }
+      article {
+        background: white;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      }
+      article h2 {
+        margin-top: 0;
+        color: #4a90e2;
+      }
+      article p {
+        margin: 0.5rem 0 0 0;
+      }
+      footer {
+        background: #333;
+        color: #ccc;
+        padding: 1.5rem 1rem;
+        text-align: center;
+        font-size: 0.9rem;
+      }
+      footer a {
+        color: #f0f0f0;
+        margin: 0 0.4rem;
+        text-decoration: none;
+      }
+      footer a:hover {
+        text-decoration: underline;
+        color: #fff;
+      }
+      @media (max-width: 600px) {
+        header h1 {
+          font-size: 2rem;
+        }
+        article {
+          padding: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Benim Blogum</h1>
+      <p>
+        <a href="https://ornek.com" title="Kişisel blogum">ornek.com kişisel blog sayfası</a>
+      </p>
+    </header>
+
+    <nav id="kategori-nav"></nav>
+    <main id="yazi-listesi"></main>
+    <div class="pagination" id="sayfalama"></div>
+
+    <footer>
+      <a href="https://twitter.com/kullanici" rel="me" target="_blank">Twitter</a>
+      &bull;
+      <a href="https://pixabay.com/users/kullanici" rel="me" target="_blank">Pixabay</a>
+      &bull;
+      <a href="https://github.com/kullanici" rel="me" target="_blank">GitHub</a>
+      &bull;
+      <a href="https://pixelfed.social/kullanici" rel="me" target="_blank">Pixelfed</a>
+      <br /><br />
+      <a href="https://mastodon.social/@kullanici" rel="me" target="_blank">Mastodon</a>
+    </footer>
+
+    <script>
+      const KATEGORILER = ['hepsi', 'yazılım', 'tasarım', 'kişisel'];
+      const MAKS_YAZI = 2;
+      let seciliKategori = 'hepsi';
+      let aktifSayfa = 1;
+      let tumYazilar = [];
+
+      function kategoriMenuOlustur() {
+        const nav = document.getElementById('kategori-nav');
+        nav.innerHTML = '';
+        KATEGORILER.forEach(kat => {
+          const btn = document.createElement('button');
+          btn.textContent = kat[0].toUpperCase() + kat.slice(1);
+          btn.onclick = () => {
+            seciliKategori = kat;
+            aktifSayfa = 1;
+            renderYazilar();
+          };
+          if (kat === seciliKategori) btn.classList.add('active');
+          nav.appendChild(btn);
+        });
+      }
+
+      function renderYazilar() {
+        kategoriMenuOlustur();
+        const ana = document.getElementById('yazi-listesi');
+        ana.innerHTML = '';
+
+        let filtreli = seciliKategori === 'hepsi' ? tumYazilar : tumYazilar.filter(y => y.kategori === seciliKategori);
+
+        const baslangic = (aktifSayfa - 1) * MAKS_YAZI;
+        const gosterilecek = filtreli.slice(baslangic, baslangic + MAKS_YAZI);
+
+        gosterilecek.forEach(yazi => {
+          const makale = document.createElement('article');
+          makale.innerHTML = `<h2>${yazi.baslik}</h2><p>${yazi.icerik}</p>`;
+          ana.appendChild(makale);
+        });
+
+        sayfalamaGoster(filtreli.length);
+      }
+
+      function sayfalamaGoster(toplam) {
+        const sayfaDiv = document.getElementById('sayfalama');
+        sayfaDiv.innerHTML = '';
+        const toplamSayfa = Math.ceil(toplam / MAKS_YAZI);
+        for (let i = 1; i <= toplamSayfa; i++) {
+          const btn = document.createElement('button');
+          btn.textContent = i;
+          if (i === aktifSayfa) btn.classList.add('active');
+          btn.onclick = () => {
+            aktifSayfa = i;
+            renderYazilar();
+          };
+          sayfaDiv.appendChild(btn);
+        }
+      }
+
+      fetch('yazilar.json')
+        .then(resp => resp.json())
+        .then(veri => {
+          tumYazilar = veri;
+          renderYazilar();
+        })
+        .catch(() => {
+          document.getElementById('yazi-listesi').innerHTML = '<p>Yazılar yüklenemedi.</p>';
+        });
+    </script>
+  </body>
 </html>
+
