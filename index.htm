@@ -1,228 +1,245 @@
 <!DOCTYPE html>
 <html lang="tr">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Kişisel Blog</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background: #f9f9f9;
-        color: #333;
-        line-height: 1.6;
-      }
-      header {
-        background: #4a90e2;
-        color: white;
-        padding: 2rem 1rem;
-        text-align: center;
-      }
-      header h1 {
-        margin: 0 0 0.5rem 0;
-        font-size: 2.5rem;
-      }
-      header a {
-        color: white;
-        text-decoration: underline;
-      }
-      nav {
-        max-width: 800px;
-        margin: 1rem auto;
-        padding: 0 1rem;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        justify-content: center;
-      }
-      nav button {
-        padding: 0.5rem 1rem;
-        border: none;
-        border-radius: 5px;
-        background-color: #eee;
-        cursor: pointer;
-      }
-      nav button.active {
-        background-color: #4a90e2;
-        color: white;
-      }
-      .search {
-        max-width: 800px;
-        margin: 1rem auto;
-        padding: 0 1rem;
-        text-align: center;
-      }
-      .search input {
-        padding: 0.5rem;
-        width: 100%;
-        max-width: 400px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-      }
-      main {
-        max-width: 800px;
-        margin: 2rem auto;
-        padding: 0 1rem;
-      }
-      article {
-        background: white;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        cursor: pointer;
-      }
-      article h2 {
-        margin-top: 0;
-        color: #4a90e2;
-      }
-      article p {
-        margin: 0.5rem 0 0 0;
-      }
-      #modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.6);
-        justify-content: center;
-        align-items: center;
-      }
-      #modal .modal-content {
-        background: white;
-        padding: 2rem;
-        border-radius: 10px;
-        max-width: 600px;
-        width: 90%;
-        max-height: 80vh;
-        overflow-y: auto;
-        position: relative;
-      }
-      #modal .close {
-        position: absolute;
-        top: 0.5rem;
-        right: 1rem;
-        font-size: 1.5rem;
-        cursor: pointer;
-        color: #333;
-      }
-      footer {
-        background: #333;
-        color: #ccc;
-        padding: 1.5rem 1rem;
-        text-align: center;
-        font-size: 0.9rem;
-      }
-      footer a {
-        color: #f0f0f0;
-        margin: 0 0.4rem;
-        text-decoration: none;
-      }
-      footer a:hover {
-        text-decoration: underline;
-        color: #fff;
-      }
-      @media (max-width: 600px) {
-        header h1 {
-          font-size: 2rem;
-        }
-        article {
-          padding: 1rem;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <header>
-      <h1>Benim Blogum</h1>
-      <p>
-        <a href="https://ornek.com" title="Kişisel blogum">ornek.com kişisel blog sayfası</a>
-      </p>
-    </header>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Canlı Aramalı Blog Listesi</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #fafafa;
+    margin: 0; padding: 0;
+    color: #333;
+  }
+  header {
+    background: #3f51b5;
+    color: white;
+    text-align: center;
+    padding: 1.5rem 1rem;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+  }
+  header h1 {
+    margin: 0; font-weight: 600;
+  }
+  .controls {
+    max-width: 960px;
+    margin: 1rem auto;
+    padding: 0 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+  }
+  .controls select, .controls input[type="search"] {
+    font-size: 1rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    border: 1px solid #bbb;
+    min-width: 200px;
+    max-width: 300px;
+  }
+  main#posts {
+    max-width: 960px;
+    margin: 1rem auto 3rem;
+    padding: 0 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(280px,1fr));
+    gap: 1.5rem;
+  }
+  .post-card {
+    background: white;
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: box-shadow 0.2s ease;
+  }
+  .post-card:hover {
+    box-shadow: 0 4px 16px rgb(0 0 0 / 0.15);
+  }
+  .post-title {
+    margin: 0 0 0.5rem 0;
+    color: #3f51b5;
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+  .post-summary {
+    flex-grow: 1;
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 0.75rem;
+  }
+  .post-meta {
+    font-size: 0.8rem;
+    color: #888;
+  }
+  @media (max-width:600px){
+    .controls {
+      flex-direction: column;
+      align-items: center;
+    }
+    .controls select, .controls input[type="search"] {
+      max-width: 100%;
+    }
+  }
+</style>
+</head>
+<body>
 
-    <div class="search">
-      <input type="text" id="aramaKutusu" placeholder="Yazı arayın..." oninput="filtrele(seciliKategori)" />
-    </div>
+<header>
+  <h1>Blog Yazıları</h1>
+  <p style="font-size:0.9rem; margin:0;">Harici JSON ve RSS verileri canlı arama ve kategori filtreli gösterim</p>
+</header>
 
-    <nav id="kategori-nav">
-      <button onclick="filtrele('hepsi')" class="active">Tümü</button>
-      <button onclick="filtrele('yazılım')">Yazılım</button>
-      <button onclick="filtrele('tasarım')">Tasarım</button>
-      <button onclick="filtrele('kişisel')">Kişisel</button>
-    </nav>
+<div class="controls">
+  <select id="categoryFilter" aria-label="Kategori seçimi">
+    <option value="all">Tüm Kategoriler</option>
+  </select>
+  <input type="search" id="searchInput" placeholder="Ara..." aria-label="Blog yazılarında arama">
+</div>
 
-    <main id="yazi-listesi"></main>
+<main id="posts" aria-live="polite" aria-atomic="true"></main>
 
-    <div id="modal">
-      <div class="modal-content">
-        <span class="close" onclick="document.getElementById('modal').style.display='none'">&times;</span>
-        <div id="modal-icerik"></div>
-      </div>
-    </div>
+<script>
+  const jsonURL = 'yazilar.json'; // Harici JSON dosyanızın yolu
+  const rssFeedUrl = 'https://api.rss2json.com/v1/api.json?rss_url=https://feeds.feedburner.com/UptodateBlog'; // Örnek RSS JSON çevirici API
 
-    <footer>
-      <a href="https://twitter.com/kullanici" rel="me" target="_blank">Twitter</a>
-      &bull;
-      <a href="https://pixabay.com/users/kullanici" rel="me" target="_blank">Pixabay</a>
-      &bull;
-      <a href="https://github.com/kullanici" rel="me" target="_blank">GitHub</a>
-      &bull;
-      <a href="https://pixelfed.social/kullanici" rel="me" target="_blank">Pixelfed</a>
-      <br /><br />
-      <a href="https://mastodon.social/@kullanici" rel="me" target="_blank">Mastodon</a>
-    </footer>
+  let allPosts = [];
 
-    <script>
-      const yazilar = [
-        {
-          baslik: "Yazılımda Temel Kavramlar",
-          icerik: "Bu yazıda yazılım geliştirmeye yeni başlayanlar için temel kavramları anlatıyorum.",
-          kategori: "yazılım"
-        },
-        {
-          baslik: "Mobil Uyumlu Tasarım Nedir?",
-          icerik: "Mobil cihazlar için tasarım yaparken dikkat edilmesi gerekenler.",
-          kategori: "tasarım"
-        },
-        {
-          baslik: "Kendimi Tanıtıyorum",
-          icerik: "Bu blogda neler paylaşacağımı ve kim olduğumu anlatıyorum.",
-          kategori: "kişisel"
-        },
-      ];
+  // Yardımcı: Kategorileri dinamik çıkarma
+  function getCategories(posts) {
+    const cats = new Set();
+    posts.forEach(p => {
+      if(p.category) cats.add(p.category.toLowerCase());
+      else cats.add('genel');
+    });
+    return Array.from(cats);
+  }
 
-      let seciliKategori = 'hepsi';
+  // Listeyi render et
+  function renderPosts(posts) {
+    const container = document.getElementById('posts');
+    container.innerHTML = '';
+    if(posts.length === 0) {
+      container.innerHTML = '<p>Gösterilecek yazı bulunamadı.</p>';
+      return;
+    }
+    posts.forEach(post => {
+      const card = document.createElement('article');
+      card.className = 'post-card';
+      card.tabIndex = 0;
+      card.setAttribute('role','button');
+      card.setAttribute('aria-label', post.title);
+      card.onclick = () => window.open(post.link || post.url || '#', '_blank');
+      card.onkeypress = e => { if(e.key === 'Enter' || e.key === ' ') card.click(); };
 
-      function filtrele(kategori) {
-        seciliKategori = kategori;
-        document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
-        const aktif = Array.from(document.querySelectorAll('nav button')).find(btn => btn.textContent.toLowerCase() === kategori);
-        if (aktif) aktif.classList.add('active');
+      const title = document.createElement('h2');
+      title.className = 'post-title';
+      title.textContent = post.title;
 
-        const liste = document.getElementById("yazi-listesi");
-        liste.innerHTML = "";
+      const summary = document.createElement('p');
+      summary.className = 'post-summary';
+      summary.textContent = post.summary || post.description || '';
 
-        const arama = document.getElementById("aramaKutusu").value.toLowerCase();
+      const meta = document.createElement('div');
+      meta.className = 'post-meta';
+      let catLabel = post.category || post.categories || 'Genel';
+      if(Array.isArray(catLabel)) catLabel = catLabel.join(', ');
+      meta.textContent = catLabel;
 
-        yazilar.forEach(yazi => {
-          if ((kategori === "hepsi" || yazi.kategori === kategori) && (yazi.baslik.toLowerCase().includes(arama) || yazi.icerik.toLowerCase().includes(arama))) {
-            const makale = document.createElement("article");
-            makale.innerHTML = `<h2>${yazi.baslik}</h2><p>${yazi.icerik}</p>`;
-            makale.onclick = () => detayGoster(yazi);
-            liste.appendChild(makale);
-          }
-        });
-      }
+      card.appendChild(title);
+      card.appendChild(summary);
+      card.appendChild(meta);
 
-      function detayGoster(yazi) {
-        document.getElementById("modal-icerik").innerHTML = `<h2>${yazi.baslik}</h2><p>${yazi.icerik}</p>`;
-        document.getElementById("modal").style.display = "flex";
-      }
+      container.appendChild(card);
+    });
+  }
 
-      filtrele("hepsi");
-    </script>
-  </body>
+  // Kategori filtresi güncelle
+  function updateCategoryFilter(categories) {
+    const select = document.getElementById('categoryFilter');
+    select.innerHTML = '<option value="all">Tüm Kategoriler</option>';
+    categories.forEach(cat => {
+      const opt = document.createElement('option');
+      opt.value = cat;
+      opt.textContent = cat[0].toUpperCase() + cat.slice(1);
+      select.appendChild(opt);
+    });
+  }
+
+  // Filtre uygula: kategori + arama
+  function filterAndRender() {
+    const catFilter = document.getElementById('categoryFilter').value.toLowerCase();
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+    let filtered = allPosts;
+
+    if(catFilter !== 'all') {
+      filtered = filtered.filter(p => {
+        if(p.category) return p.category.toLowerCase() === catFilter;
+        if(p.categories && Array.isArray(p.categories)) return p.categories.map(c => c.toLowerCase()).includes(catFilter);
+        return false;
+      });
+    }
+
+    if(searchTerm) {
+      filtered = filtered.filter(p => 
+        (p.title && p.title.toLowerCase().includes(searchTerm)) ||
+        (p.summary && p.summary.toLowerCase().includes(searchTerm)) ||
+        (p.description && p.description.toLowerCase().includes(searchTerm))
+      );
+    }
+
+    renderPosts(filtered);
+  }
+
+  // Veri çek: JSON + RSS
+  async function loadData() {
+    try {
+      // JSON yükle
+      const jsonResp = await fetch(jsonURL);
+      const jsonData = await jsonResp.json();
+
+      // RSS yükle
+      const rssResp = await fetch(rssFeedUrl);
+      const rssData = await rssResp.json();
+
+      // RSS itemları uygun formata çevir
+      const rssPosts = (rssData.items || []).map(item => ({
+        title: item.title,
+        link: item.link,
+        description: item.description || item.contentSnippet,
+        categories: item.categories || [],
+        pubDate: item.pubDate
+      }));
+
+      // Tüm postları birleştir
+      allPosts = [...jsonData, ...rssPosts];
+
+      // Kategorileri güncelle
+      const cats = getCategories(allPosts);
+      updateCategoryFilter(cats);
+
+      // İlk render
+      filterAndRender();
+
+    } catch (err) {
+      console.error('Veri yükleme hatası:', err);
+      document.getElementById('posts').innerHTML = '<p>Veriler yüklenemedi.</p>';
+    }
+  }
+
+  // Event listenerlar
+  document.getElementById('searchInput').addEventListener('input', filterAndRender);
+  document.getElementById('categoryFilter').addEventListener('change', filterAndRender);
+
+  // Sayfa yüklenince veri çek
+  window.addEventListener('load', loadData);
+
+</script>
+
+</body>
 </html>
